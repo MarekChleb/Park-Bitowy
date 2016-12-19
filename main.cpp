@@ -166,10 +166,10 @@ void update_furthest (int current_lea) {
         if (furthest_up_val[current_lea] > height[furthest_down[current_lea]]
                                            - height[current_lea]) {
             furthest[current_lea] = furthest_up[current_lea];
-            furthest_val = furthest_up_val[current_lea];
+            furthest_val[current_lea] = furthest_up_val[current_lea];
         } else {
             furthest[current_lea] = furthest_down[current_lea];
-            furthest_val = height[furthest_down[current_lea]]
+            furthest_val[current_lea] = height[furthest_down[current_lea]]
                            - height[current_lea];
         }
         if (DEBUG) {
