@@ -204,7 +204,23 @@ void find_distant_fathers(int current_lea, int height) {
 }
 
 int find_ancestor(int current_lea, int height) {
+    if (DEBUG) {
+        cout << "Ancestor of " << current_lea << " higher by " << height <<
+                " is ";
+    }
     int i = log2(N);
+    while (height > 0) {
+        if (pow(2, i) > height) {
+            i--;
+        } else {
+            current_lea = fathers[current_lea][i];
+            height -= pow(2, i);
+        }
+    }
+    if (DEBUG) {
+        cout << current_lea << endl;
+    }
+    return current_lea;
 }
 
 int main() {
