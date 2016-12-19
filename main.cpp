@@ -4,9 +4,11 @@
 
 #include <iostream>
 #include <vector>
+#include <math.h>
 
 #define MAX_NUMBER_OF_LEAS 500006
 #define MAX_NUMBER_OF_QUERIES 500006
+#define MAX_NUMBER_OF_FATHERS 22
 #define NO_EDGE -1
 
 using namespace std;
@@ -28,9 +30,10 @@ int visited[MAX_NUMBER_OF_LEAS], height[MAX_NUMBER_OF_LEAS],
         furthest_down[MAX_NUMBER_OF_LEAS], furthest_up[MAX_NUMBER_OF_LEAS],
         furthest_up_val[MAX_NUMBER_OF_LEAS], left_son[MAX_NUMBER_OF_LEAS],
         right_son[MAX_NUMBER_OF_LEAS], brother[MAX_NUMBER_OF_LEAS],
-        furthest[MAX_NUMBER_OF_LEAS], furthest_val[MAX_NUMBER_OF_LEAS];
+        furthest[MAX_NUMBER_OF_LEAS], furthest_val[MAX_NUMBER_OF_LEAS],
+        fathers[MAX_NUMBER_OF_LEAS][MAX_NUMBER_OF_FATHERS];
 int N, M;
-vector<int> neighbours[MAX_NUMBER_OF_LEAS], binary_tree[MAX_NUMBER_OF_LEAS];
+vector<int> neighbours[MAX_NUMBER_OF_LEAS];
 bool DEBUG = true;
 
 void push_edge(int i, int second) {
@@ -75,6 +78,7 @@ void build_tree(int current_lea, int current_height) {
                 }
                 right_son[current_lea] = lea;
             }
+            fathers[lea][0] = current_lea;
             build_tree(lea, current_height + 1);
         }
     }
@@ -82,7 +86,7 @@ void build_tree(int current_lea, int current_height) {
         cout << "Ended " << current_lea << endl;
     }
 }
-
+/*
 void build_height(int current_lea, int current_height) {
     if (DEBUG) {
         cout << "Height of " << current_lea << " is " << current_height << endl;
@@ -94,7 +98,7 @@ void build_height(int current_lea, int current_height) {
             build_height(lea, current_height + 1);
         }
     }
-}
+}*/
 
 void update_furthest_down (int current_lea) {
     if (current_lea != 0) {
@@ -177,7 +181,30 @@ void update_furthest (int current_lea) {
                     furthest[current_lea] << " and its distance is " <<
                     furthest_val[current_lea] << endl;
         }
+        update_furthest(left_son[current_lea]);
+        update_furthest(right_son[current_lea]);
     }
+}
+
+void find_distant_fathers(int current_lea, int height) {
+    if (current_lea != 0) {
+        int how_far_is_our_father = 2, i = 0;
+        while (height >= how_far_is_our_father) {
+            if (DEBUG) {
+                cout << fathers[fathers[current_lea][i]][i] << " is father of " <<
+                        current_lea << " distant by 2^" << i+1 << endl;
+            }
+            fathers[current_lea][i + 1] = fathers[fathers[current_lea][i]][i];
+            i++;
+            how_far_is_our_father *= 2;
+        }
+        find_distant_fathers(left_son[current_lea], height + 1);
+        find_distant_fathers(right_son[current_lea], height + 1);
+    }
+}
+
+int find_ancestor(int current_lea, int height) {
+    int i = log2(N);
 }
 
 int main() {
@@ -188,6 +215,8 @@ int main() {
     update_furthest_down(1);
     find_brothers(1);
     update_furthest_up(1, 0);
+    update_furthest(1);
+    find_distant_fathers(1, 0);
     return 0;
 }
 
