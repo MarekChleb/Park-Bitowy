@@ -139,7 +139,7 @@ void update_furthest_up (int current_lea, int my_father) {
             int ffu_value = 1 + furthest_up_val[my_father],
                     bfd_value = 2 + height[brothers_fd] -
                     height[brother[current_lea]];
-            if (ffu_value > bfd_value) {
+            if (ffu_value >= bfd_value) {
                 furthest_up[current_lea] = fathers_fu;
                 furthest_up_val[current_lea] = ffu_value;
             } else {
