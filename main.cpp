@@ -39,7 +39,7 @@ int visited[MAX_NUMBER_OF_LEAS], height[MAX_NUMBER_OF_LEAS],
         fathers[MAX_NUMBER_OF_LEAS][MAX_NUMBER_OF_FATHERS];
 int N, M;
 vector<int> neighbours[MAX_NUMBER_OF_LEAS];
-bool DEBUG = true;
+bool DEBUG = false;
 
 void push_edge(int i, int second) {
     if (second != NO_EDGE) {
@@ -138,13 +138,18 @@ void update_furthest_up (int current_lea, int my_father) {
                     brothers_fd = furthest_down[brother[current_lea]];
             int ffu_value = 1 + furthest_up_val[my_father],
                     bfd_value = 2 + height[brothers_fd] -
-                    height[brother[current_lea]];
-            if (ffu_value >= bfd_value) {
+                                height[brother[current_lea]];
+            if (brother[current_lea] != 0) {
+                if (ffu_value > bfd_value) {
+                    furthest_up[current_lea] = fathers_fu;
+                    furthest_up_val[current_lea] = ffu_value;
+                } else {
+                    furthest_up[current_lea] = brothers_fd;
+                    furthest_up_val[current_lea] = bfd_value;
+                }
+            } else {
                 furthest_up[current_lea] = fathers_fu;
                 furthest_up_val[current_lea] = ffu_value;
-            } else {
-                furthest_up[current_lea] = brothers_fd;
-                furthest_up_val[current_lea] = bfd_value;
             }
         }
         if (DEBUG) {
@@ -216,10 +221,7 @@ int find_ancestor(int current_lea, int height) {
 }
 
 int get_closest_common_father(int lea1, int lea2) {
-    if (DEBUG) {
-        cout << "The closest common father of " << lea1 << " and " << lea2 <<
-                " is ";
-    }
+    int l1 = lea1, l2 = lea2;
     int h1 = height[lea1], h2 = height[lea2];
     if (h1 < h2) {
         lea2 = find_ancestor(lea2, h2 - h1);
@@ -227,6 +229,10 @@ int get_closest_common_father(int lea1, int lea2) {
     } else {
         lea1 = find_ancestor(lea1, h1 - h2);
         h1 = height[lea1];
+    }
+    if (DEBUG) {
+        cout << "The closest common father of " << l1 << " and " << l2 <<
+             " is ";
     }
     if (lea1 == lea2) {
         if (DEBUG) {
@@ -242,6 +248,7 @@ int get_closest_common_father(int lea1, int lea2) {
             }
             i--;
         }
+
         if (DEBUG) {
             cout << fathers[lea1][0] << endl;
         }
@@ -260,13 +267,13 @@ int query(int lea, int distance) {
         int common_ancestor = get_closest_common_father(lea, furthest[lea]);
         int dist1 = height[lea] - height[common_ancestor], dist2 =
                 height[furthest[lea]] - height[common_ancestor];
+        int answer = (distance <= dist1 ? find_ancestor(lea, distance) :
+                      find_ancestor(furthest[lea], furthest_val[lea] - distance));
         if (DEBUG) {
             cout << "The answer for the query: " << lea << ", " << distance
-            << " is " << (distance <= dist1 ? find_ancestor(lea, distance) :
-            find_ancestor(furthest[lea], furthest_val[lea] - distance)) << endl;
+            << " is " << answer << endl;
         }
-        return distance < dist1 ? find_ancestor(lea, distance) :
-               find_ancestor(furthest[lea], furthest_val[lea] - distance);
+        return answer;
     }
 }
 
