@@ -69,9 +69,15 @@ void build_tree(int actual_lea) {
 }
 
 void build_height(int actual_lea, int actual_height) {
-    if (!visited[actual_lea]) {
-        height[actual_lea] = actual_height;
-        visited[actual_lea] = 1;
+    if (DEBUG) {
+        cout << "Height of " << actual_lea << " is " << actual_height << endl;
+    }
+    height[actual_lea] = actual_height;
+    visited[actual_lea] = 0;
+    for (int lea: binary_tree[actual_lea]) {
+        if (visited[lea] == 1) {
+            build_height(lea, actual_height + 1);
+        }
     }
 }
 
@@ -81,6 +87,7 @@ void build_height(int actual_lea, int actual_height) {
 int main() {
     build_edges();
     build_tree(1);
+    build_height(1, 0);
     return 0;
 }
 
