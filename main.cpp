@@ -27,7 +27,8 @@ using namespace std;
 int visited[MAX_NUMBER_OF_LEAS], height[MAX_NUMBER_OF_LEAS],
         furthest_down[MAX_NUMBER_OF_LEAS], furthest_up[MAX_NUMBER_OF_LEAS],
         furthest_up_val[MAX_NUMBER_OF_LEAS], left_son[MAX_NUMBER_OF_LEAS],
-        right_son[MAX_NUMBER_OF_LEAS], brother[MAX_NUMBER_OF_LEAS];
+        right_son[MAX_NUMBER_OF_LEAS], brother[MAX_NUMBER_OF_LEAS],
+        furthest[MAX_NUMBER_OF_LEAS], furthest_val[MAX_NUMBER_OF_LEAS];
 int N, M;
 vector<int> neighbours[MAX_NUMBER_OF_LEAS], binary_tree[MAX_NUMBER_OF_LEAS];
 bool DEBUG = true;
@@ -140,16 +141,42 @@ void update_furthest_up (int current_lea, int my_father) {
             int fathers_fu = furthest_up[my_father],
                     brothers_fd = furthest_down[brother[current_lea]];
             int ffu_value = 1 + furthest_up_val[my_father],
-                    bfd_value = 2 + height[brothers_fd];
-            furthest_up[current_lea] = ffu_value > bfd_value ? fathers_fu :
-                                       brothers_fd;
+                    bfd_value = 2 + height[brothers_fd] -
+                    height[brother[current_lea]];
+            if (ffu_value > bfd_value) {
+                furthest_up[current_lea] = fathers_fu;
+                furthest_up_val[current_lea] = ffu_value;
+            } else {
+                furthest_up[current_lea] = brothers_fd;
+                furthest_up_val[current_lea] = bfd_value;
+            }
         }
         if (DEBUG) {
             cout << "Furthest up for " << current_lea << " is " <<
-                    furthest_up[current_lea] << endl;
+                    furthest_up[current_lea] << " and its distance is " <<
+                    furthest_up_val[current_lea] << endl;
         }
         update_furthest_up(left_son[current_lea], current_lea);
         update_furthest_up(right_son[current_lea], current_lea);
+    }
+}
+
+void update_furthest (int current_lea) {
+    if (current_lea != 0) {
+        if (furthest_up_val[current_lea] > height[furthest_down[current_lea]]
+                                           - height[current_lea]) {
+            furthest[current_lea] = furthest_up[current_lea];
+            furthest_val = furthest_up_val[current_lea];
+        } else {
+            furthest[current_lea] = furthest_down[current_lea];
+            furthest_val = height[furthest_down[current_lea]]
+                           - height[current_lea];
+        }
+        if (DEBUG) {
+            cout << "The furthest lea from " << current_lea << " is " <<
+                    furthest[current_lea] << " and its distance is " <<
+                    furthest_val[current_lea] << endl;
+        }
     }
 }
 
