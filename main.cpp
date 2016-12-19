@@ -26,8 +26,8 @@ using namespace std;
 
 int visited[MAX_NUMBER_OF_LEAS], height[MAX_NUMBER_OF_LEAS],
         furthest_down[MAX_NUMBER_OF_LEAS], furthest_up[MAX_NUMBER_OF_LEAS],
-        left_son[MAX_NUMBER_OF_LEAS], right_son[MAX_NUMBER_OF_LEAS],
-        brother[MAX_NUMBER_OF_LEAS];
+        furthest_up_val[MAX_NUMBER_OF_LEAS], left_son[MAX_NUMBER_OF_LEAS],
+        right_son[MAX_NUMBER_OF_LEAS], brother[MAX_NUMBER_OF_LEAS];
 int N, M;
 vector<int> neighbours[MAX_NUMBER_OF_LEAS], binary_tree[MAX_NUMBER_OF_LEAS];
 bool DEBUG = true;
@@ -101,13 +101,13 @@ void update_furthest_down (int current_lea) {
         update_furthest_down(right_son[current_lea]);
         int lfd = furthest_down[left_son[current_lea]], rfd =
                 furthest_down[right_son[current_lea]];
-        if (lfd == rfd) {
+        if (lfd == rfd) { //current_lea is a leaf in our tree
             furthest_down[current_lea] = current_lea;
         } else {
             furthest_down[current_lea] = height[lfd] >= height[rfd] ? lfd : rfd;
         }
         if (DEBUG) {
-            cout << "Furthest down for " << current_lea << " si " <<
+            cout << "Furthest down for " << current_lea << " is " <<
                     furthest_down[current_lea] << endl;
         }
     }
@@ -133,9 +133,23 @@ void find_brothers (int current_lea) {
 
 void update_furthest_up (int current_lea, int my_father) {
     if (current_lea != 0) {
-        if (current_lea == my_father) {
+        if (my_father == 0) { //we are in a root
             furthest_up[current_lea] = current_lea;
+            furthest_up_val[current_lea] = 0;
+        } else {
+            int fathers_fu = furthest_up[my_father],
+                    brothers_fd = furthest_down[brother[current_lea]];
+            int ffu_value = 1 + furthest_up_val[my_father],
+                    bfd_value = 2 + height[brothers_fd];
+            furthest_up[current_lea] = ffu_value > bfd_value ? fathers_fu :
+                                       brothers_fd;
         }
+        if (DEBUG) {
+            cout << "Furthest up for " << current_lea << " is " <<
+                    furthest_up[current_lea] << endl;
+        }
+        update_furthest_up(left_son[current_lea], current_lea);
+        update_furthest_up(right_son[current_lea], current_lea);
     }
 }
 
@@ -146,6 +160,7 @@ int main() {
     build_tree(1, 0);
     update_furthest_down(1);
     find_brothers(1);
+    update_furthest_up(1, 0);
     return 0;
 }
 
