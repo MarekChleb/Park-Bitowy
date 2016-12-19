@@ -159,7 +159,7 @@ void update_furthest_up (int current_lea, int my_father) {
 
 void update_furthest (int current_lea) {
     if (current_lea != 0) {
-        if (furthest_up_val[current_lea] > height[furthest_down[current_lea]]
+        if (furthest_up_val[current_lea] >= height[furthest_down[current_lea]]
                                            - height[current_lea]) {
             furthest[current_lea] = furthest_up[current_lea];
             furthest_val[current_lea] = furthest_up_val[current_lea];
@@ -251,13 +251,31 @@ int get_closest_common_father(int lea1, int lea2) {
 
 int query(int lea, int distance) {
     if (distance > furthest_val[lea]) {
+        if (DEBUG) {
+            cout << "The answer for the query: " << lea << ", " << distance
+            << " is -1" << endl;
+        }
         return -1;
     } else {
         int common_ancestor = get_closest_common_father(lea, furthest[lea]);
         int dist1 = height[lea] - height[common_ancestor], dist2 =
                 height[furthest[lea]] - height[common_ancestor];
-        return distance <= dist1 ? find_ancestor(lea, distance) :
+        if (DEBUG) {
+            cout << "The answer for the query: " << lea << ", " << distance
+            << " is " << (distance <= dist1 ? find_ancestor(lea, distance) :
+            find_ancestor(furthest[lea], furthest_val[lea] - distance)) << endl;
+        }
+        return distance < dist1 ? find_ancestor(lea, distance) :
                find_ancestor(furthest[lea], furthest_val[lea] - distance);
+    }
+}
+
+void answer_queries() {
+    scanf("%d", &M);
+    int q1, q2;
+    for (int i = 0; i < M; i++) {
+        scanf("%d%d", &q1, &q2);
+        printf("%d\n", query(q1, q2));
     }
 }
 
@@ -271,7 +289,7 @@ int main() {
     update_furthest_up(1, 0);
     update_furthest(1);
     find_distant_fathers(1, 0);
-
+    answer_queries();
     /*get_closest_common_father(8, 6);
     get_closest_common_father(2, 4);*/
     return 0;
