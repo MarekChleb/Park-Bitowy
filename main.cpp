@@ -2,6 +2,11 @@
 // Created by Marek on 2016-12-19.
 //
 
+/*
+ * https://szkopul.edu.pl/c/asdlab-2016/p/par/
+ *
+ */
+
 #include <iostream>
 #include <vector>
 #include <math.h>
@@ -22,8 +27,8 @@ using namespace std;
  *  + jego wysokości
  *  + brat
  *  + drzewo
- *  - test
- *  - the rest
+ *  + test
+ *  + the rest
  */
 
 int visited[MAX_NUMBER_OF_LEAS], height[MAX_NUMBER_OF_LEAS],
@@ -86,19 +91,6 @@ void build_tree(int current_lea, int current_height) {
         cout << "Ended " << current_lea << endl;
     }
 }
-/*
-void build_height(int current_lea, int current_height) {
-    if (DEBUG) {
-        cout << "Height of " << current_lea << " is " << current_height << endl;
-    }
-    height[current_lea] = current_height;
-    visited[current_lea] = 0;
-    for (int lea: binary_tree[current_lea]) {
-        if (visited[lea] == 1) {
-            build_height(lea, current_height + 1);
-        }
-    }
-}*/
 
 void update_furthest_down (int current_lea) {
     if (current_lea != 0) {
@@ -223,6 +215,52 @@ int find_ancestor(int current_lea, int height) {
     return current_lea;
 }
 
+int get_closest_common_father(int lea1, int lea2) {
+    if (DEBUG) {
+        cout << "The closest common father of " << lea1 << " and " << lea2 <<
+                " is ";
+    }
+    int h1 = height[lea1], h2 = height[lea2];
+    if (h1 < h2) {
+        lea2 = find_ancestor(lea2, h2 - h1);
+        h2 = height[lea2];
+    } else {
+        lea1 = find_ancestor(lea1, h1 - h2);
+        h1 = height[lea1];
+    }
+    if (lea1 == lea2) {
+        if (DEBUG) {
+            cout << lea1 << endl;
+        }
+        return lea1;
+    } else {
+        int i = log2(N);
+        while (i >= 0) {
+            if (fathers[lea1][i] != fathers[lea2][i]) {
+                lea1 = fathers[lea1][i];
+                lea2 = fathers[lea2][i];
+            }
+            i--;
+        }
+        if (DEBUG) {
+            cout << fathers[lea1][0] << endl;
+        }
+        return fathers[lea1][0];
+    }
+}
+
+int query(int lea, int distance) {
+    if (distance > furthest_val[lea]) {
+        return -1;
+    } else {
+        int common_ancestor = get_closest_common_father(lea, furthest[lea]);
+        int dist1 = height[lea] - height[common_ancestor], dist2 =
+                height[furthest[lea]] - height[common_ancestor];
+        return distance <= dist1 ? find_ancestor(lea, distance) :
+               find_ancestor(furthest[lea], furthest_val[lea] - distance);
+    }
+}
+
 int main() {
     std::ios_base::sync_with_stdio(false);
 
@@ -233,6 +271,9 @@ int main() {
     update_furthest_up(1, 0);
     update_furthest(1);
     find_distant_fathers(1, 0);
+
+    /*get_closest_common_father(8, 6);
+    get_closest_common_father(2, 4);*/
     return 0;
 }
 
