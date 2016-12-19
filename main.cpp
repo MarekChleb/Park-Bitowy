@@ -31,6 +31,9 @@ bool DEBUG = true;
 
 void push_edge(int i, int second) {
     if (second != NO_EDGE) {
+        if (DEBUG) {
+            cout << "Pushing edge " << i << ", " << second << endl;
+        }
         neighbours[i].push_back(second);
         neighbours[second].push_back(i);
     }
@@ -39,8 +42,8 @@ void push_edge(int i, int second) {
 void build_edges() {
     scanf("%d", &N);
     int l, r;
-    for (int i = 0; i < N; i++) {
-        scanf("%d %d", &l, &r);
+    for (int i = 1; i <= N; i++) {
+        scanf("%d%d", &l, &r);
         push_edge(i, l);
         push_edge(i, r);
     }
@@ -52,8 +55,12 @@ void build_tree(int actual_lea) {
     }
     visited[actual_lea] = 1;
     for (int lea: neighbours[actual_lea]) {
-        if (!visited[lea]) {
+        if (visited[lea] == 0) {
+            if (DEBUG) {
+                cout << actual_lea << " -> " << lea << endl;
+            }
             binary_tree[actual_lea].push_back(lea);
+            build_tree(lea);
         }
     }
     if (DEBUG) {
