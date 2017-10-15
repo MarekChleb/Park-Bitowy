@@ -1,12 +1,3 @@
-//
-// Created by Marek on 2016-12-19.
-//
-
-/*
- * https://szkopul.edu.pl/c/asdlab-2016/p/par/
- *
- */
-
 #include <iostream>
 #include <vector>
 #include <math.h>
@@ -17,19 +8,6 @@
 #define NO_EDGE -1
 
 using namespace std;
-
-/**
- * TODO
- * dla danego wierzchołka potrzebujemy:
- *  ? tablica ojców w odległości 2^i
- *  + odległości najdalej oddalonego wierzchołka w górę i wskaźnieka do niego
- *  + odległości najdalej oddalonego wierzchołka w dół i wskaźnieka do niego
- *  + jego wysokości
- *  + brat
- *  + drzewo
- *  + test
- *  + the rest
- */
 
 int visited[MAX_NUMBER_OF_LEAS], height[MAX_NUMBER_OF_LEAS],
         furthest_down[MAX_NUMBER_OF_LEAS], furthest_up[MAX_NUMBER_OF_LEAS],
@@ -297,8 +275,6 @@ int main() {
     update_furthest(1);
     find_distant_fathers(1, 0);
     answer_queries();
-    /*get_closest_common_father(8, 6);
-    get_closest_common_father(2, 4);*/
     return 0;
 }
 
